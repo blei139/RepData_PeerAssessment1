@@ -1,5 +1,6 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
+        by Bernard Lei
 output: https://github.com/blei139/RepData_PeerAssessment1/
   html_document: https://github.com/blei139/RepData_PeerAssessment1/PA1_template.html
     keep_md: true
@@ -46,7 +47,7 @@ for (i in 1:nrow(act)) {
 
 # Aggregate the steps each day with the imputed values
 stepseachdayimp <- aggregate(steps ~ date, act, sum)
-##    Histogram of the total number of steps taken each day after missing values are imputed
+##    Histogram of the total number of steps taken each day after missing values are imputed.
 hist(stepseachdayimp$steps, main = "Histogram of Total Number of Steps Each day Imputed", xlab = "Steps Each Day Imputed")
 round(mean(stepseachdayimp$steps))
 
