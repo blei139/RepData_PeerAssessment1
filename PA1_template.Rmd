@@ -1,25 +1,35 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-        by Bernard Lei
-output: https://github.com/blei139/RepData_PeerAssessment1/
-  html_document: https://github.com/blei139/RepData_PeerAssessment1/PA1_template.html
-    keep_md: true
----
+## Title: "Reproducible Research: Peer Assessment 1"
+## Author: Bernard Lei
+## Output: https://github.com/blei139/RepData_PeerAssessment1/
+## Html_document: 
+## https://github.com/blei139/RepData_PeerAssessment1/PA1_template.html
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
 
 ## Loading and preprocessing the data
+```{r}
 act <- read.csv("repdata_data_activity/activity.csv")
+
 
 # Remove the NA values and store in a new data set
 completeact <- act[complete.cases(act), ]
+```
 
 ##    Histogram of the total number of steps taken each day
+```{r}
 # Calculate the total number of steps taken per day
 stepseachday <- aggregate(steps ~ date, completeact, sum)
 
 # Create a his togram of no of steps per day
 hist(stepseachday$steps, main = "Histogram of Total Number of Steps Each day", xlab = "Steps Taken Each Day")
+```
 
 ## What is mean total number of steps taken per day?
+```{r}
 meansteps <- round(mean(stepseachday$steps))
 mediansteps <- round(median(stepseachday$steps))
 
@@ -31,9 +41,10 @@ medstepseachday <- aggregate(steps ~ date, completeact, median)
 plot(avgstepseachint$interval, avgstepseachint$steps, type='l', col="green", main="Average Number of Steps by Interval", xlab="Time Intervals", ylab="Average Number of Steps")
 ##    The 5-minute interval that, on average, contains the maximum number of steps
 maxintindex <- which.max(avgstepseachint$steps)
-
+```
 
 ## Imputing missing values
+```{r}
 ## The strategy is to replace the missing data with the average data for that day
 # Calculate the number of rows with missing values
 missingvalues <- act[!complete.cases(act), ]
@@ -52,8 +63,10 @@ hist(stepseachdayimp$steps, main = "Histogram of Total Number of Steps Each day 
 round(mean(stepseachdayimp$steps))
 
 median(stepseachdayimp$steps)
+```
 
 ## Are there differences in activity patterns between weekdays and weekends?
+```{r}
 #create a function to determine which weekday it is
 week_day <- function(date_val) {
     wd <- weekdays(as.Date(date_val, '%Y-%m-%d'))
@@ -82,3 +95,4 @@ panelplt <- ggplot(stepseachdayimp, aes(interval, steps)) +
     labs(x="Interval", y=expression("No of Steps")) +
     ggtitle("No of steps Per Interval by day type")
 print(panelplt)
+```
