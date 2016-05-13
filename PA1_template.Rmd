@@ -1,25 +1,83 @@
 ---
 title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
+output: https://github.com/blei139/RepData_PeerAssessment1/
+  html_document: https://github.com/blei139/RepData_PeerAssessment1/PA1_template.html
     keep_md: true
 ---
 
-
 ## Loading and preprocessing the data
+act <- read.csv("repdata_data_activity/activity.csv")
 
+# Remove the NA values and store in a new data set
+completeact <- act[complete.cases(act), ]
 
+##    Histogram of the total number of steps taken each day
+# Calculate the total number of steps taken per day
+stepseachday <- aggregate(steps ~ date, completeact, sum)
+
+# Create a his togram of no of steps per day
+hist(stepseachday$steps, main = "Histogram of Total Number of Steps Each day", xlab = "Steps Taken Each Day")
 
 ## What is mean total number of steps taken per day?
-
-
+meansteps <- round(mean(stepseachday$steps))
+mediansteps <- round(median(stepseachday$steps))
 
 ## What is the average daily activity pattern?
+avgstepseachint <- aggregate(steps ~ interval, completeact, mean)
+medstepseachday <- aggregate(steps ~ date, completeact, median)
 
+# Plot the time series with appropriate labels and heading
+plot(avgstepseachint$interval, avgstepseachint$steps, type='l', col="green", main="Average Number of Steps by Interval", xlab="Time Intervals", ylab="Average Number of Steps")
+##    The 5-minute interval that, on average, contains the maximum number of steps
+maxintindex <- which.max(avgstepseachint$steps)
 
 
 ## Imputing missing values
+## The strategy is to replace the missing data with the average data for that day
+# Calculate the number of rows with missing values
+missingvalues <- act[!complete.cases(act), ]
+nrow(missingvalues)
 
+for (i in 1:nrow(act)) {
+    if(is.na(act$steps[i])) {
+        act$steps[i] <- avgstepseachint$steps[which(avgstepseachint$interval == act$interval[i])] 
+    }
+}
 
+# Aggregate the steps each day with the imputed values
+stepseachdayimp <- aggregate(steps ~ date, act, sum)
+##    Histogram of the total number of steps taken each day after missing values are imputed
+hist(stepseachdayimp$steps, main = "Histogram of Total Number of Steps Each day Imputed", xlab = "Steps Each Day Imputed")
+round(mean(stepseachdayimp$steps))
+
+median(stepseachdayimp$steps)
 
 ## Are there differences in activity patterns between weekdays and weekends?
+#create a function to determine which weekday it is
+week_day <- function(date_val) {
+    wd <- weekdays(as.Date(date_val, '%Y-%m-%d'))
+    if  (!(wd == 'Saturday' || wd == 'Sunday')) {
+        x <- 'Weekday'
+    } else {
+        x <- 'Weekend'
+    }
+    x
+}
+
+# Apply the week_day function and add a new column to activity dataset
+act$day_type <- as.factor(sapply(act$date, week_day))
+
+#load the ggplot library
+library(ggplot2)
+
+# Create the aggregated data frame by intervals and day_type
+stepseachdayimp <- aggregate(steps ~ interval+day_type, act, mean)
+
+# Create the panel plot
+panelplt <- ggplot(stepseachdayimp, aes(interval, steps)) +
+    geom_line(stat = "identity", aes(colour = day_type)) +
+    theme_gray() +
+    facet_grid(day_type ~ ., scales="fixed", space="fixed") +
+    labs(x="Interval", y=expression("No of Steps")) +
+    ggtitle("No of steps Per Interval by day type")
+print(panelplt)
